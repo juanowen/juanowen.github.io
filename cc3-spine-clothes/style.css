@@ -5,7 +5,7 @@ body {
   margin: 0;
 
   text-align: center;
-  background-color: white;
+  background-color: black;
   font-family: Helvetica, Verdana, Arial, sans-serif;
 }
 
@@ -35,7 +35,6 @@ canvas {
     position:relative;
     border:5px solid black;
     border-radius: 10px;
-    box-shadow: 0 5px 50px #333
 }
 
 #Cocos3dGameContainer, #GameCanvas {
