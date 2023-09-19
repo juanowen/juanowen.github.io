@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+
+  <title>Cocos Creator | TransformAdapter</title>
+
+  <!--http://www.html5rocks.com/en/mobile/mobifying/-->
+  <meta name="viewport"
+        content="width=device-width,user-scalable=no,initial-scale=1,minimum-scale=1,maximum-scale=1,minimal-ui=true"/>
+
+  <!--https://developer.apple.com/library/safari/documentation/AppleApplications/Reference/SafariHTMLRef/Articles/MetaTags.html-->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="format-detection" content="telephone=no">
+
+  <!-- force webkit on 360 -->
+  <meta name="renderer" content="webkit"/>
+  <meta name="force-rendering" content="webkit"/>
+  <!-- force edge on IE -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <meta name="msapplication-tap-highlight" content="no">
+
+  <!-- force full screen on some browser -->
+  <meta name="full-screen" content="yes"/>
+  <meta name="x5-fullscreen" content="true"/>
+  <meta name="360-fullscreen" content="true"/>
+
+  <!--fix fireball/issues/3568 -->
+  <!--<meta name="browsermode" content="application">-->
+  <meta name="x5-page-mode" content="app">
+
+  <!--<link rel="apple-touch-icon" href=".png" />-->
+  <!--<link rel="apple-touch-icon-precomposed" href=".png" />-->
+
+  <link rel="stylesheet" type="text/css" href="style.css"/>
+
+</head>
+<body>
+  <div id="GameDiv">
+      <div id="Cocos3dGameContainer">
+        <canvas id="GameCanvas" oncontextmenu="event.preventDefault()" tabindex="0"></canvas>
+      </div>
+    </div>
+
+    <style>
+      .transform_props {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        padding: 10px;
+        background: rgba(0,0,0,.8);
+        border-radius: 2%;
+        transition: opacity .5s;
+        opacity: 0;
+        display: none;
+      }
+  
+      .transform_props fieldset {
+        display: grid;
+        grid-template-columns: 110px 150px 10px;
+        grid-column-gap: 10px;
+        align-items: center;
+      }
+  
+      .transform_props fieldset > span {
+        text-align: right;
+      }
+
+      .transform_props fieldset > strong {
+        border: 1px solid;
+        display: block;
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        font-size: 12px;
+        text-align: center;
+        margin-left: -2px;
+        margin-top: -2px;
+      }
+  
+      .transform_props button {
+        margin-top: 7px;
+        width: 100%;
+      }
+    </style>
+    <div class="transform_props">
+        <fieldset>
+          <legend>Landscape</legend>
+          <span>Resize mode:</span>
+          <select name="land_resize_mode" onchange="onSelectUpdate()">
+            <option value="OriginalSize">Original Size</option>
+            <option value="ResizeByProps">Resize By Props</option>
+            <option value="ResizeByWidth">Resize By Width</option>
+            <option value="ResizeByHeight" selected>Resize By Height</option>
+          </select>
+          <strong title="OriginalSize - node size will remain unchanged
+ResizeByProps - width and height will be calculated based on the settings below 
+ResizeByWidth - width will be calculated based on the settings below, height will be proportional to width 
+ResizeByHeight - height will be calculated based on the settings below, width will be proportional to height">?</strong>
+          <span>Width:</span>
+          <input name="land_width" value="0">
+          <strong title="Use +, -, *, / operands to manipulate dimensions below
+
+  px - pixels
+  pw - parent width (percentage)
+  ph - parent height (percentage)
+  vw - view width (percentage)
+  vh - view height (percentage)">?</strong>
+          <span>Height:</span>
+          <input name="land_height" value="50vh">
+          <strong title="Use +, -, *, / operands to manipulate dimensions below
+
+  px - pixels
+  pw - parent width (percentage)
+  ph - parent height (percentage)
+  vw - view width (percentage)
+  vh - view height (percentage)">?</strong>
+          
+          <span>Position type:</span>
+          <select name="land_position_type" onchange="onSelectUpdate()">
+            <option value="OriginalPosition">Original Position</option>
+            <option value="RelativeToParent">Relative To Parent</option>
+            <option value="Absolute" selected>Absolute</option>
+          </select>
+          <strong title="OriginalPosition - node position will remain unchanged
+RelativeToParent - position will be calculated from parent center
+Absolute - position will be calculated from left-bottom angle of screen">?</strong>
+          <span>X:</span>
+          <input name="land_x" value="50vw">
+          <strong title="Use +, -, *, / operands to manipulate dimensions below
+
+  px - pixels
+  sw - self width (percentage)
+  sh - self height (percentage)
+  pw - parent width (percentage)
+  ph - parent height (percentage)
+  vw - view width (percentage)
+  vh - view height (percentage)">?</strong>
+          <span>Y:</span>
+          <input name="land_y" value="50vh">
+          <strong title="Use +, -, *, / operands to manipulate dimensions below
+
+  px - pixels
+  sw - self width (percentage)
+  sh - self height (percentage)
+  pw - parent width (percentage)
+  ph - parent height (percentage)
+  vw - view width (percentage)
+  vh - view height (percentage)">?</strong>
+        </fieldset>
+  
+        <fieldset>
+          <legend>Portrait</legend>
+          <span>Resize mode:</span>
+          <select name="port_resize_mode" onchange="onSelectUpdate()">
+            <option value="OriginalSize">Original Size</option>
+            <option value="ResizeByProps">Resize By Props</option>
+            <option value="ResizeByWidth" selected>Resize By Width</option>
+            <option value="ResizeByHeight">Resize By Height</option>
+          </select>
+          <strong title="OriginalSize - node size will remain unchanged
+ResizeByProps - width and height will be calculated based on the settings below 
+ResizeByWidth - width will be calculated based on the settings below, height will be proportional to width 
+ResizeByHeight - height will be calculated based on the settings below, width will be proportional to height">?</strong>
+          <span>Width:</span>
+          <input name="port_width" value="50vw">
+          <strong title="Use +, -, *, / operands to manipulate dimensions below
+
+  px - pixels
+  pw - parent width (percentage)
+  ph - parent height (percentage)
+  vw - view width (percentage)
+  vh - view height (percentage)">?</strong>
+          <span>Height:</span>
+          <input name="port_height" value="0">
+          <strong title="Use +, -, *, / operands to manipulate dimensions below
+
+  px - pixels
+  pw - parent width (percentage)
+  ph - parent height (percentage)
+  vw - view width (percentage)
+  vh - view height (percentage)">?</strong>
+          
+          <span>Position type:</span>
+          <select name="port_position_type" onchange="onSelectUpdate()">
+            <option value="OriginalPosition">Original Position</option>
+            <option value="RelativeToParent">Relative To Parent</option>
+            <option value="Absolute" selected>Absolute</option>
+          </select>
+          <strong title="OriginalPosition - node position will remain unchanged
+RelativeToParent - position will be calculated from parent center
+Absolute - position will be calculated from left-bottom angle of screen">?</strong>
+          <span>X:</span>
+          <input name="port_x" value="50vw">
+          <strong title="Use +, -, *, / operands to manipulate dimensions below
+
+  px - pixels
+  sw - self width (percentage)
+  sh - self height (percentage)
+  pw - parent width (percentage)
+  ph - parent height (percentage)
+  vw - view width (percentage)
+  vh - view height (percentage)">?</strong>
+          <span>Y:</span>
+          <input name="port_y" value="50vh">
+          <strong title="Use +, -, *, / operands to manipulate dimensions below
+
+  px - pixels
+  sw - self width (percentage)
+  sh - self height (percentage)
+  pw - parent width (percentage)
+  ph - parent height (percentage)
+  vw - view width (percentage)
+  vh - view height (percentage)">?</strong>
+        </fieldset>
+  
+        <button onclick="submitForm()">Submit</button>
+    </div>
+    <script>
+      const formData = {
+        land_resize_mode: 'OriginalSize',
+        land_width: '',
+        land_height: '',
+        land_position_type: 'OriginalPosition',
+        land_x: '',
+        land_y: '',
+        port_resize_mode: 'OriginalSize',
+        port_width: '',
+        port_height: '',
+        port_position_type: 'OriginalPosition',
+        port_x: '',
+        port_y: ''
+      }
+  
+      document.querySelector('.transform_props').addEventListener('mouseleave', () => {
+        document.querySelector('.transform_props').style.opacity = '0.15';
+      });
+      document.querySelector('.transform_props').addEventListener('mouseenter', () => {
+        document.querySelector('.transform_props').style.opacity = '1';
+      });
+  
+      const inputs = document.querySelectorAll('.transform_props input');
+      const selects = document.querySelectorAll('.transform_props select');
+  
+      function fillFormData() {
+        inputs.forEach(input => {
+          formData[input.name] = input.value;
+        });
+        selects.forEach(select => {
+          formData[select.name] = select.value;
+        });
+      }
+  
+      function fillForm() {
+        inputs.forEach(input => {
+          input.value = formData[input.name];
+        });
+        selects.forEach(select => {
+          select.value = formData[select.name];
+        });
+      }
+  
+      function setPropsVisibility() {
+        inputs.forEach(input => {
+          switch(input.name) {
+            case 'land_width': 
+              input.style.display = formData.land_resize_mode !== 'ResizeByHeight' && formData.land_resize_mode !== 'OriginalSize' ? 'block' : 'none'; 
+              input.previousSibling.previousSibling.style.display = formData.land_resize_mode !== 'ResizeByHeight' && formData.land_resize_mode !== 'OriginalSize' ? 'block' : 'none';
+              input.nextSibling.nextSibling.style.display = formData.land_resize_mode !== 'ResizeByHeight' && formData.land_resize_mode !== 'OriginalSize' ? 'block' : 'none';
+              break;
+            case 'land_height': 
+              input.style.display = formData.land_resize_mode !== 'ResizeByWidth' && formData.land_resize_mode !== 'OriginalSize' ? 'block' : 'none'; 
+              input.previousSibling.previousSibling.style.display = formData.land_resize_mode !== 'ResizeByWidth' && formData.land_resize_mode !== 'OriginalSize' ? 'block' : 'none';
+              input.nextSibling.nextSibling.style.display = formData.land_resize_mode !== 'ResizeByWidth' && formData.land_resize_mode !== 'OriginalSize' ? 'block' : 'none';
+              break;
+            case 'land_x': 
+            case 'land_y': 
+              input.style.display = formData.land_position_type !== 'OriginalPosition' ? 'block' : 'none'; 
+              input.previousSibling.previousSibling.style.display = formData.land_position_type !== 'OriginalPosition' ? 'block' : 'none'; 
+              input.nextSibling.nextSibling.style.display = formData.land_position_type !== 'OriginalPosition' ? 'block' : 'none'; 
+              break;
+  
+            case 'port_width': 
+              input.style.display = formData.port_resize_mode !== 'ResizeByHeight' && formData.port_resize_mode !== 'OriginalSize' ? 'block' : 'none'; 
+              input.previousSibling.previousSibling.style.display = formData.port_resize_mode !== 'ResizeByHeight' && formData.port_resize_mode !== 'OriginalSize' ? 'block' : 'none';
+              input.nextSibling.nextSibling.style.display = formData.port_resize_mode !== 'ResizeByHeight' && formData.port_resize_mode !== 'OriginalSize' ? 'block' : 'none';
+              break;
+            case 'port_height': 
+              input.style.display = formData.port_resize_mode !== 'ResizeByWidth' && formData.port_resize_mode !== 'OriginalSize' ? 'block' : 'none'; 
+              input.previousSibling.previousSibling.style.display = formData.port_resize_mode !== 'ResizeByWidth' && formData.port_resize_mode !== 'OriginalSize' ? 'block' : 'none';
+              input.nextSibling.nextSibling.style.display = formData.port_resize_mode !== 'ResizeByWidth' && formData.port_resize_mode !== 'OriginalSize' ? 'block' : 'none';
+              break;
+            case 'port_x': 
+            case 'port_y': 
+              input.style.display = formData.port_position_type !== 'OriginalPosition' ? 'block' : 'none'; 
+              input.previousSibling.previousSibling.style.display = formData.port_position_type !== 'OriginalPosition' ? 'block' : 'none'; 
+              input.nextSibling.nextSibling.style.display = formData.port_position_type !== 'OriginalPosition' ? 'block' : 'none'; 
+              break;
+          }
+        });
+      }
+  
+      function onSelectUpdate() {
+        fillFormData();
+        setPropsVisibility();
+      }
+  
+      function submitForm() {
+        fillFormData();
+        const result = window.debug_component.updateSettings({
+          landscape: {
+              resizeMode: formData.land_resize_mode,
+              width: formData.land_width,
+              height: formData.land_height,
+              positionType: formData.land_position_type,
+              x: formData.land_x,
+              y: formData.land_y
+          },
+          portrait: {
+              resizeMode: formData.port_resize_mode,
+              width: formData.port_width,
+              height: formData.port_height,
+              positionType: formData.port_position_type,
+              x: formData.port_x,
+              y: formData.port_y
+          }
+        });
+  
+        Object.keys(result).forEach(key => {
+          formData[key] = result[key];
+        });
+  
+        fillForm();
+      }
+  
+      onSelectUpdate();
+  
+      function show_debug_props() {
+        document.querySelector('.transform_props').style.display = 'block';
+        document.querySelector('.transform_props').style.opacity = '1';
+      }
+    </script>
+  
+<!-- Polyfills bundle. -->
+<script src="src/polyfills.bundle.js" charset="utf-8"> </script>
+
+<!-- SystemJS support. -->
+<script src="src/system.bundle.js" charset="utf-8"> </script>
+
+<!-- Import map -->
+<script src="src/import-map.json" type="systemjs-importmap" charset="utf-8"> </script>
+
+<script>
+    System.import('./index.js').catch(function(err) { console.error(err); })
+</script>
+
+</body>
+</html>
