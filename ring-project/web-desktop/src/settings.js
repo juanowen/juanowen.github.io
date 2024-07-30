@@ -1,0 +1,1 @@
+window._CCSettings={platform:"web-desktop",groupList:["default","ring","lock","limiter"],collisionMatrix:[[true],[false,false,true,true],[false,true,true],[false,true,false,true]],hasResourcesBundle:false,hasStartSceneBundle:false,remoteBundles:[],subpackages:[],launchScene:"db://assets/scenes/LoadingScene.fire",orientation:"",jsList:[]};
